@@ -1,9 +1,10 @@
 import random
 import itertools as it
-
+import functools
 # blackjack
 
 
+@functools.total_ordering
 class Card:
     def __init__(self, rank, suit):
         """ Creates a card of the given rank and suit.
@@ -28,7 +29,10 @@ class Card:
         return "" + str(self._rank) + str(self._suit)
 
     def __eq__(self, other):
-        return self._rank == other._rank and self._suit == other._suit
+        return self._rank == other._rank
+
+    def __lt__(self, other):
+        return self.rank() < other.rank()
 
     def __hash__(self):
         return self._hash
@@ -101,6 +105,10 @@ class Game:
             self.shoe_size = shoe_size
             self.hand_over = hand_over
 
+        def __str__(self):
+            # return str(self.player_hand) + " " + str(self.dealer_hand) + " " + str(self.bet) + " " + str(self.money) + " " + str(self.bet_sizes[-1]) + " " + str(self.shoe_size) + " " + str(self.hand_over)
+            return "---\nPlayer Hand: " + str(self.player_hand) + " " + str(self.score(self.player_hand)) + "\nDealer Hand: " + str(self.dealer_hand) + "\nBet: " + str(self.bet) + "\nMoney: " + str(self.money) + "\nBet Sizes: " + str(self.bet_sizes[-1]) + "\nShoe Size: " + str(self.shoe_size) + "\nHand Over: " + str(self.hand_over) + "\n---"
+
         def get_actions(self):
             if self.hand_over:
                 return self.bet_sizes
@@ -111,18 +119,18 @@ class Game:
 
         def successor(self, action):
             succ = Game.State(self.player_hand, self.dealer_hand, self.deck,
-                              self.bet, self.money, self.bet_sizes, self.shoe_size)
+                              self.bet, self.money, self.bet_sizes, self.shoe_size, self.hand_over)
 
             if action == 'H':
-                succ.player_hand.append(self.deck.deal(1))
+                succ.player_hand += self.deck.deal(1)
                 if self.score(succ.player_hand) > 21:
                     succ.hand_over = True
-                    return succ
+                return succ
 
             elif action == 'S':
                 succ.hand_over = True
                 while self.score(succ.dealer_hand) < 17:
-                    succ.dealer_hand.append(self.deck.deal(1))
+                    succ.dealer_hand += self.deck.deal(1)
                 return succ
             else:
                 succ.bet = action
@@ -145,8 +153,3 @@ class Game:
                 else:
                     score += card.rank()
             return score
-
-        def stand(self):
-            while self.score(self.dealer_hand) < 17:
-                self.dealer_hand.append(self.deck.deal(1))
-            return self.payoff()
