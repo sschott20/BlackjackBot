@@ -109,6 +109,32 @@ class Game:
             # return str(self.player_hand) + " " + str(self.dealer_hand) + " " + str(self.bet) + " " + str(self.money) + " " + str(self.bet_sizes[-1]) + " " + str(self.shoe_size) + " " + str(self.hand_over)
             return "---\nPlayer Hand: " + str(self.player_hand) + " " + str(self.score(self.player_hand)) + "\nDealer Hand: " + str(self.dealer_hand) + "\nBet: " + str(self.bet) + "\nMoney: " + str(self.money) + "\nBet Sizes: " + str(self.bet_sizes[-1]) + "\nShoe Size: " + str(self.shoe_size) + "\nHand Over: " + str(self.hand_over) + "\n---"
 
+        def payoff(self):
+            if not self.hand_over:
+                return 0
+            player_score = self.score(self.player_hand)
+            dealer_score = self.score(self.dealer_hand)
+            # naturals
+            if player_score == 21 and dealer_score != 21:
+                if len(self.player_hand) == 2:
+                    return 1.5 * self.bet
+                else:
+                    return self.bet
+            elif player_score != 21 and dealer_score == 21:
+                return -1 * self.bet
+            elif player_score == 21 and dealer_score == 21:
+                return 0
+            elif player_score > 21:
+                return -1 * self.bet
+            elif dealer_score > 21:
+                return self.bet
+            elif player_score == dealer_score:
+                return 0
+            elif player_score > dealer_score:
+                return self.bet
+            else:
+                return -1 * self.bet
+
         def get_actions(self):
             if self.hand_over:
                 return self.bet_sizes
@@ -123,8 +149,10 @@ class Game:
 
             if action == 'H':
                 succ.player_hand += self.deck.deal(1)
-                if self.score(succ.player_hand) > 21:
+                if self.score(succ.player_hand) >= 21:
                     succ.hand_over = True
+                    while self.score(succ.dealer_hand) < 17:
+                        succ.dealer_hand += self.deck.deal(1)
                 return succ
 
             elif action == 'S':
@@ -136,7 +164,10 @@ class Game:
                 succ.bet = action
                 succ.player_hand = self.deck.deal(2)
                 succ.dealer_hand = self.deck.deal(2)
-                self.hand_over = False
+                if self.score(succ.player_hand) == 21 or self.score(succ.dealer_hand) == 21:
+                    succ.hand_over = True
+                else:
+                    self.hand_over = False
                 return succ
 
         def score(self, hand):
