@@ -28,8 +28,13 @@ def hit_until(state):
             return "H"
         else:
             return "S"
+
+
 def gamble(state):
-    
+    if state.hand_over:
+        return 1
+    else:
+        return 'D'
 
 
 def user_mode(state):
@@ -55,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('--time', dest='time', type=float,
                         action="store", default=.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
-                        "user", "always_hit", "always_stand", "hit_until", "mcts", "mcts2"], default="basic", help="model to use")
+                        "user", "always_hit", "always_stand", "hit_until", "mcts", "mcts2", "gamble"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
     parser.add_argument("--pen ", dest="pen", type=int,
@@ -76,6 +81,8 @@ if __name__ == "__main__":
         predict = mcts.mcts_policy(args.time)
     elif args.model == "mcts2":
         predict = mcts2.mcts_policy(args.time)
+    elif args.model == "gamble":
+        predict = gamble
     bets = [i for i in range(1, 11, 3)]
     game = Game(args.shoe_size, bets)
     num_hands = 0
