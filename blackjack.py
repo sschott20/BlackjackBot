@@ -80,12 +80,22 @@ class Game:
         self.shoe_size = shoe_size
         self.shuffle()
         self.state = self.initial_state()
+        self.actions = ['H', 'S']
 
     def all_ranks(self):
         return range(1, 14)
 
     def all_suits(self):
         return ['S', 'H', 'D', 'C']
+    
+    def get_actions(self):
+        return self.actions
+    
+    def num_of_actions(self):
+        return len(self.actions)
+    
+    def game_over(self):
+        return self.deck.size <= (self.shoe_size*52)/6
 
     def shuffle(self):
         self.deck = Deck(self.all_ranks(), self.all_suits(), self.shoe_size)
@@ -220,7 +230,9 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
-            return self.player_hand
+            if len(self.player_hand == 0):
+                return 0
+            return self.score(self.player_hand)
 
         def _compute_hash(self):
             # faster hash computation; thanks to CF
