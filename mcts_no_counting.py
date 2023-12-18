@@ -19,11 +19,14 @@ def weight(reward, visits, total):
 
 
 def mcts(state, d, is_start):
-
+    # if state is terminal, return reward
+    # state_hash = hash(state)
     if state.hand_over and not is_start:
         return state.payoff()
     state_hash = hash(state)
-
+    # print(state_hash)
+    # print(state)
+    # otherwise choose the action with max weight
     actions = state.get_actions()
     total = 0
     sim = False
@@ -53,10 +56,9 @@ def mcts(state, d, is_start):
 
 
 def mcts_policy(time_limit):
+    d = {}
 
     def mcts_wrapper(start_state):
-        d = {}
-
         start = time.time()
 
         actions = start_state.get_actions()
@@ -64,15 +66,13 @@ def mcts_policy(time_limit):
         for s in actions:
             if (start_hash, s) not in d:
                 d[(start_hash, s)] = [0, 0]
-
-        tmp_state = copy.deepcopy(start_state)
-        # cards = start_state.deck._cards.copy()
-
+        # print(hash(start_state))
         while time.time() - start < time_limit:
-            # tmp_state.deck._cards = cards.copy()
-            # tmp_state.deck.shuffle()
+            # print(d)
+            # print(start_state.deck.size())
             tmp_state = copy.deepcopy(start_state)
-            tmp_state.deck.shuffle()
+            tmp_state.deck = blackjack.Deck(
+                range(1, 14), ['S', 'H', 'D', 'C'], 6)
             mcts(tmp_state, d, True)
         scores = []
 

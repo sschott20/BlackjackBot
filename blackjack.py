@@ -174,31 +174,6 @@ class Game:
             # succ._compute_hash()
             return succ
 
-        def update_game(self, action):
-            if action == 'H':
-                self.player_hand += self.deck.deal(1)
-                if self.score(self.player_hand) >= 21:
-                    self.hand_over = True
-                    while self.score(self.dealer_hand) < 17:
-                        self.dealer_hand += self.deck.deal(1)
-            elif action == 'S':
-                self.hand_over = True
-                while self.score(self.dealer_hand) < 17:
-                    self.dealer_hand += self.deck.deal(1)
-                return self
-            elif int(action) in self.get_actions():
-                self.bet = int(action)
-                self.player_hand = self.deck.deal(2)
-                self.dealer_hand = self.deck.deal(2)
-                if self.score(self.player_hand) == 21 or self.score(self.dealer_hand) == 21:
-                    self.hand_over = True
-                else:
-                    self.hand_over = False
-            else:
-                print("Invalid action")
-            # self._compute_hash()
-            return self
-
         def score(self, hand):
             score = 0
             sorted_hand = sorted(hand, reverse=True)
