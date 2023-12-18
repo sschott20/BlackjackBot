@@ -89,7 +89,7 @@ class Game:
 
     def all_suits(self):
         return ['S', 'H', 'D', 'C']
-
+    
     def get_postflop_actions(self):
         return self.postflop_actions
     
@@ -164,7 +164,7 @@ class Game:
                 succ.player_hand += succ.deck.deal(1)
                 if succ.score(succ.player_hand) >= 21:
                     succ.hand_over = True
-                    while succ.score(succ.dealer_hand) < 17:
+                    while not succ.hand_over and succ.score(succ.dealer_hand) < 17:
                         succ.dealer_hand += succ.deck.deal(1)
             elif action == 'S':
                 succ.hand_over = True
@@ -182,6 +182,31 @@ class Game:
                 print("Invalid action")
             # succ._compute_hash()
             return succ
+
+        def update_game(self, action):
+            if action == 'H':
+                self.player_hand += self.deck.deal(1)
+                if self.score(self.player_hand) >= 21:
+                    self.hand_over = True
+                    while self.score(self.dealer_hand) < 17 and not self.hand_over:
+                        self.dealer_hand += self.deck.deal(1)
+            elif action == 'S':
+                self.hand_over = True
+                while self.score(self.dealer_hand) < 17:
+                    self.dealer_hand += self.deck.deal(1)
+                return self
+            elif int(action) in self.get_actions():
+                self.bet = int(action)
+                self.player_hand = self.deck.deal(2)
+                self.dealer_hand = self.deck.deal(2)
+                if self.score(self.player_hand) == 21 or self.score(self.dealer_hand) == 21:
+                    self.hand_over = True
+                else:
+                    self.hand_over = False
+            else:
+                print("Invalid action")
+            # self._compute_hash()
+            return self
 
         def score(self, hand):
             score = 0
@@ -204,6 +229,7 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
+            print('hi')
             if len(self.player_hand) == 0:
                 return 0
             return self.score(self.player_hand)

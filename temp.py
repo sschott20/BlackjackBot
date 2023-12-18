@@ -204,9 +204,7 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
-            if len(self.player_hand) == 0:
-                return 0
-            return self.score(self.player_hand)
+            return self.player_hand
 
         def _compute_hash(self):
             # faster hash computation; thanks to CF
