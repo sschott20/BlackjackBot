@@ -155,7 +155,7 @@ class Game:
                 succ.player_hand += succ.deck.deal(1)
                 if succ.score(succ.player_hand) >= 21:
                     succ.hand_over = True
-                    while succ.score(succ.dealer_hand) < 17:
+                    while succ.score(succ.dealer_hand) < 17 and not succ.hand_over:
                         succ.dealer_hand += succ.deck.deal(1)
             elif action == 'S':
                 succ.hand_over = True
