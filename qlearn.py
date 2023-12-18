@@ -1,19 +1,18 @@
 import time, random, copy, blackjack
 LEARNING_RATE = 0.25
 DISCOUNT_FACTOR = 0.99
-EPSILON = 0.15
+EPSILON_START = 0.15
+EPSILON_END = 0.01
+EPSILON_DECAY = 0.995
 
 def qlearn_policy(game, time_limit):
     def get_action(state):
-        if random.random() < EPSILON:
+        if random.random() < epsilon:
             if len(state.player_hand) == 0 or state.hand_over:
-                # print('bet')
                 return actions[random.randint(len(postflop_actions), len(actions)-1)]
             else:
-                # print('hit or stand')
                 return actions[random.randint(0, len(postflop_actions)-1)]
         else:
-            # print('opt')
             return get_optimal_action(state)
     
     def calc_running_total(hand):
@@ -38,8 +37,6 @@ def qlearn_policy(game, time_limit):
             running_count += calc_running_total(player_hand)
             running_count += calc_running_total(dealer_hand[0:1])
         decks_remaining = float(state.deck.size())/52
-        print(f"deck size: {state.deck.size()}")
-        print(f"decks remaining: {decks_remaining}")
         true_count = running_count/decks_remaining
         return running_count, true_count, decks_remaining
     
@@ -51,19 +48,27 @@ def qlearn_policy(game, time_limit):
     
     def find_key(superState, action):
         true_count, player_total, usable_ace, dealer_total = superState
-        bucket = 0
+        true_count_bucket = 0
         if true_count < -5:
-            bucket = 0
+            true_count_bucket = 0
         elif -5 <= true_count <= -1:
-            bucket = 1
+            true_count_bucket = 1
         elif -1 <= true_count <= 1:
-            bucket = 2
+            true_count_bucket = 2
         elif 2 <= true_count <= 5:
-            bucket = 3
+            true_count_bucket = 3
         elif true_count > 5:
-            bucket = 4
+            true_count_bucket = 4
         
-        return (player_total, dealer_total, usable_ace, bucket, action)
+        player_total_bucket = 0
+        if player_total < 6:
+            player_total_bucket = 0
+        elif player_total < 15:
+            player_total_bucket = 1
+        else:
+            player_total_bucket = 2
+        
+        return (player_total_bucket, dealer_total, usable_ace, true_count_bucket, action)
     
     def q_update(superState, action, reward, nextState, running_count):
         # need to identify the next state and the next action
@@ -75,25 +80,22 @@ def qlearn_policy(game, time_limit):
         if nextState.hand_over:
             q_vals[statekey] += (alpha_vals[statekey] * (reward - q_vals[statekey]))
         else:
-            nextSuperState = (true_count, nextState.player_score(), check_ace(nextState), nextState.dealer_score())
+            next_player_score = nextState.player_score()
+            nextSuperState = (true_count, next_player_score, check_ace(nextState), nextState.dealer_score())
             next_action = get_action(nextState) 
             next_action = actions.index(next_action)
             next_statekey = find_key(nextSuperState, next_action)
             td_target = reward + DISCOUNT_FACTOR * q_vals[next_statekey]
             td_error = td_target - q_vals[statekey]
             q_vals[statekey] += (alpha_vals[statekey] * td_error)
-        alpha_vals[statekey] *= 0.99
+        alpha_vals[statekey] *= 0.999
     
     def calc_true_count(state):
-        # print(state.deck.cards_played)
-        # deck = blackjack.Deck(range(1,14), ['S', 'H', 'D', 'C'], state.shoe_size)
-        # print(deck._cards)
-        # print(len(state.deck._cards))
+        running_count = 0
         if state.deck.size() == 52*(state.shoe_size):
             return 0
         
         for card in state.deck.cards_played:
-            running_count = 0
             if card.rank() == 1:
                 running_count -= 1
             elif 2 <= card.rank() <= 6:
@@ -102,24 +104,19 @@ def qlearn_policy(game, time_limit):
                 running_count -= 1
 
         true_count = running_count/(state.deck.size()/52)
-        # print(true_count)
         return true_count
 
     def get_optimal_action(state):
         # need to calculate the true count from the state given
         true_count = calc_true_count(state)
-        # print(f"playerscore: {state.player_score()}")
-        if state.player_score() >= 21:
+        player_score = state.player_score()
+        if player_score >= 21:
             player_score = 0
-        else:
-            player_score = state.player_score()
         superState = (true_count, player_score, check_ace(state), state.dealer_score())
         maxQ = float('-inf')
         maxAction = None
         if state.hand_over:
             for action in range(len(postflop_actions), len(actions)):
-                print(f"superStatekey: {find_key(superState, action)}")
-                # print(find_key(superState, action))
                 Q_val = q_vals[find_key(superState, action)]
                 if Q_val > maxQ:
                     maxQ = Q_val
@@ -139,7 +136,7 @@ def qlearn_policy(game, time_limit):
     q_vals = {}
     alpha_vals = {}
     for action in range(len(actions)):
-        for player in range(22): #hand_total
+        for player in range(3): #hand_total
             for dealer in range(12): #dealer_total
                 for true_count in range(5):
                     for ace in range(2):
@@ -147,6 +144,7 @@ def qlearn_policy(game, time_limit):
                         alpha_vals[(player,dealer,ace,true_count,action)] = LEARNING_RATE
 
     end_time = time.time() + time_limit
+    epsilon = EPSILON_START
     intial_state = game.initial_state()
     while time.time() < end_time:
         tmp = copy.deepcopy(intial_state)
@@ -157,14 +155,9 @@ def qlearn_policy(game, time_limit):
         true_count = 0
         decks_remaining = game.shoe_size * 6
         while tmp.deck.size() > (game.shoe_size*52)/6:
-            print(tmp)
             action = get_action(tmp)
-            print(f"action: {action}")
-            print(f"remaining deck size: {tmp.deck.size()}")
             tmp = tmp.successor(action) # place bet and cards are dealt
-            print(tmp)
-            player_total = tmp.player_score()
-            print(f"player total: {player_total}")
+            player_total = 15 if tmp.player_score() > 14 else tmp.player_score()
             dealer_total = tmp.dealer_score()
             running_count, true_count, decks_remaining = count_cards(running_count, tmp)
             usable_ace = check_ace(tmp)
@@ -172,13 +165,12 @@ def qlearn_policy(game, time_limit):
             reward = 0
             while not tmp.hand_over:
                 action = get_action(tmp) # postflop action (hit or stand)
-                print(f"action: {action}")
                 tmp = tmp.successor(action)
-                print(tmp)
                 reward += tmp.payoff()
-                print(f"reward: {reward}")
-                print(f"superState: {superState}")
                 q_update(superState, action, reward, tmp, running_count)
-            print('hand over')
+        epsilon = max(EPSILON_END, epsilon * EPSILON_DECAY)
+        # for key in q_vals.keys():
+        #     if q_vals[key] != 0:
+        #         print(f"key: {key}, q_val: {q_vals[key]}")
 
     return get_optimal_action

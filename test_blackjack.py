@@ -2,8 +2,9 @@ from blackjack import *
 import sys
 import argparse
 import time
-import mcts
-import qlearn
+import mcts, qlearn
+import mcts_no_counting as mcts2
+
 
 def always_stand(state):
     if state.hand_over:
@@ -50,17 +51,19 @@ if __name__ == "__main__":
     parser.add_argument('--count', dest='count', type=int, action="store",
                         default=1, help='number of shoes to play (default=1)')
     parser.add_argument('--time', dest='time', type=float,
-                        action="store", default=0.1, help='time allowed per move')
+                        action="store", default=.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
-                        "user", "always_hit", "always_stand", "hit_until", "mcts", "qlearn"], default="basic", help="model to use")
+                        "user", "always_hit", "always_stand", "hit_until", "mcts", "mcts2", "qlearn"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
     parser.add_argument("--pen ", dest="pen", type=int,
                         default=6, help="percentage of shoe to reshuffle")
     parser.add_argument("--display", dest="display", action="store_true")
+    parser.add_argument("--user", dest="user", action="store_true")
 
     args = parser.parse_args()
-    game = Game(args.shoe_size, [i for i in range(1, 10, 3)])
+    bets = [i for i in range(1, 11, 3)]
+    game = Game(args.shoe_size, bets)
     if args.model == "user":
         predict = user_mode
     elif args.model == "always_stand":
@@ -71,35 +74,39 @@ if __name__ == "__main__":
         predict = hit_until
     elif args.model == "mcts":
         predict = mcts.mcts_policy(args.time)
+    elif args.model == "mcts2":
+        predict = mcts2.mcts_policy(args.time)
     elif args.model == "qlearn":
         predict = qlearn.qlearn_policy(game, args.time)
-    # print([i for i in range(1, 11, 3)])
     num_hands = 0
 
     for i in range(args.count):
+        current_shoe_winnings = 0
         # print("Shoe " + str(i + 1) + " of " + str(args.count))
         game.shuffle()
         game.new_shoe()
-        while game.deck.size() > (args.shoe_size * 52) / 6:
+        while game.deck.size() > (args.shoe_size * 52) / args.pen:
             # print(game.deck.size())
             num_hands += 1
             bet = predict(game.state)
-            game.state.update_game(bet)
+            if args.user:
+                print("Bet: " + str(bet))
+            game.state = game.state.successor(bet)
             while not game.state.hand_over:
                 # print(game.state, game.deck.size())
 
                 action = predict(game.state)
-                if args.display:
+                if args.user:
                     print(game.state.player_hand,
                           game.state.score(game.state.player_hand))
                     print([game.state.dealer_hand[0]])
                     print("Action: " + str(action))
-                game.state.update_game(action)
+                game.state = game.state.successor(action)
 
                 if game.state.hand_over:
                     payoff = game.state.payoff()
                     game.state.money += payoff
-                    if args.display:
+                    if args.user:
                         print("Hand over")
                         print("Player got a " + str(game.state.player_hand) +
                               " for a score of ", game.state.score(game.state.player_hand))
@@ -114,6 +121,12 @@ if __name__ == "__main__":
                             print("You lost " + str(game.state.bet))
                         input("Current balance: " +
                               str(game.state.money) + "\n")
-    print("Money: $" + str(game.state.money))
-    print("Hands: " + str(num_hands))
-    print("Money per hand: $" + str(game.state.money / num_hands))
+        if args.display:
+            print("---------")
+            print("Money: $" + str(game.state.money))
+            print("Hands: " + str(num_hands))
+            print("Money per hand: $" + str(game.state.money / num_hands))
+        print("--------")
+        print("Money: $" + str(game.state.money))
+        print("Hands: " + str(num_hands))
+        print("Money per hand: $" + str(game.state.money / num_hands))
