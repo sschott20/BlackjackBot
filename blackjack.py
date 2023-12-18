@@ -66,6 +66,8 @@ class Deck:
 
             n -- an integer between 0 and the size of this deck (inclusive)
         """
+        if n < 0 or n > self.size():
+            raise ValueError("Invalid number of cards to deal: " + str(n))
         dealt = self._cards[-n:]
         dealt.reverse()
         del self._cards[-n:]
@@ -169,7 +171,7 @@ class Game:
                     succ.hand_over = False
             else:
                 print("Invalid action")
-            succ._compute_hash()
+            # succ._compute_hash()
             return succ
 
         def update_game(self, action):
@@ -194,7 +196,7 @@ class Game:
                     self.hand_over = False
             else:
                 print("Invalid action")
-            self._compute_hash()
+            # self._compute_hash()
             return self
 
         def score(self, hand):
@@ -212,6 +214,14 @@ class Game:
                     score += card.rank()
             return score
 
+        def dealer_score(self):
+            if len(self.dealer_hand) == 0:
+                return 0
+            return self.score([self.dealer_hand[0]])
+
+        def player_score(self):
+            return self.player_hand
+
         def _compute_hash(self):
             # faster hash computation; thanks to CF
             if self.hand_over:
@@ -220,8 +230,13 @@ class Game:
 
             hash_state = (self.score(self.player_hand),
                           self.score([self.dealer_hand[0]]))
+
             self.hash = hash(hash_state)
 
         def __hash__(self):
-            self._compute_hash()
-            return self.hash
+            # self._compute_hash()
+            # return self.hash
+            # print(self.score(self.player_hand))
+            if len(self.dealer_hand) == 0:
+                return hash((self.score(self.player_hand), 0))
+            return hash((self.score(self.player_hand), self.score([self.dealer_hand[0]])))

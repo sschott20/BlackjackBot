@@ -75,7 +75,7 @@ if __name__ == "__main__":
         game.shuffle()
         game.new_shoe()
         while game.deck.size() > (args.shoe_size * 52) / 6:
-            # print(game.deck.size())
+            print(game.deck.size())
             num_hands += 1
             bet = predict(game.state)
             game.state.update_game(bet)
