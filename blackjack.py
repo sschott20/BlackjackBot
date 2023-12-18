@@ -74,12 +74,10 @@ class Deck:
 
 class Game:
     def __init__(self, shoe_size, bet_sizes):
-        self.money = 0
-        self.player_hand = []
-        self.dealer_hand = []
-        self.shuffle()
         self.bet_sizes = bet_sizes
         self.shoe_size = shoe_size
+        self.shuffle()
+        self.state = self.initial_state()
 
     def all_ranks(self):
         return range(1, 14)
@@ -88,11 +86,16 @@ class Game:
         return ['S', 'H', 'D', 'C']
 
     def shuffle(self):
-        self.deck = Deck(self.all_ranks(), self.all_suits(), 1)
+        self.deck = Deck(self.all_ranks(), self.all_suits(), self.shoe_size)
         self.deck.shuffle()
 
     def initial_state(self):
-        return Game.State([], [], self.deck, 0, self.money, self.bet_sizes, self.shoe_size, False)
+        return Game.State([], [], self.deck, 0, 0, self.bet_sizes, self.shoe_size, True)
+
+    def new_shoe(self):
+        self.shuffle()
+        self.state = Game.State(
+            [], [], self.deck, 0, self.state.money, self.bet_sizes, self.shoe_size, True)
 
     class State:
         def __init__(self, player_hand, dealer_hand, deck: Deck, bet, money, bet_sizes, shoe_size, hand_over) -> None:
@@ -144,31 +147,31 @@ class Game:
         #     if self.hand_over:
 
         def successor(self, action):
-            succ = Game.State(self.player_hand, self.dealer_hand, self.deck,
-                              self.bet, self.money, self.bet_sizes, self.shoe_size, self.hand_over)
 
             if action == 'H':
-                succ.player_hand += self.deck.deal(1)
-                if self.score(succ.player_hand) >= 21:
-                    succ.hand_over = True
-                    while self.score(succ.dealer_hand) < 17:
-                        succ.dealer_hand += self.deck.deal(1)
-                return succ
-
+                self.player_hand += self.deck.deal(1)
+                if self.score(self.player_hand) >= 21:
+                    self.hand_over = True
+                    while self.score(self.dealer_hand) < 17:
+                        self.dealer_hand += self.deck.deal(1)
+                return self
             elif action == 'S':
-                succ.hand_over = True
-                while self.score(succ.dealer_hand) < 17:
-                    succ.dealer_hand += self.deck.deal(1)
-                return succ
-            else:
-                succ.bet = action
-                succ.player_hand = self.deck.deal(2)
-                succ.dealer_hand = self.deck.deal(2)
-                if self.score(succ.player_hand) == 21 or self.score(succ.dealer_hand) == 21:
-                    succ.hand_over = True
+                self.hand_over = True
+                while self.score(self.dealer_hand) < 17:
+                    self.dealer_hand += self.deck.deal(1)
+                return self
+            elif int(action) in self.get_actions():
+                self.bet = int(action)
+                self.player_hand = self.deck.deal(2)
+                self.dealer_hand = self.deck.deal(2)
+                if self.score(self.player_hand) == 21 or self.score(self.dealer_hand) == 21:
+                    self.hand_over = True
                 else:
                     self.hand_over = False
-                return succ
+                return self
+            else:
+                print("Invalid action")
+                return self
 
         def score(self, hand):
             score = 0
