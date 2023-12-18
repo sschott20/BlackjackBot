@@ -147,14 +147,38 @@ class Game:
         #     if self.hand_over:
 
         def successor(self, action):
+            succ = Game.State(self.player_hand, self.dealer_hand, self.deck,
+                              self.bet, self.money, self.bet_sizes, self.shoe_size, self.hand_over)
+            if action == 'H':
+                succ.player_hand += succ.deck.deal(1)
+                if succ.score(succ.player_hand) >= 21:
+                    succ.hand_over = True
+                    while succ.score(succ.dealer_hand) < 17:
+                        succ.dealer_hand += succ.deck.deal(1)
+            elif action == 'S':
+                succ.hand_over = True
+                while succ.score(succ.dealer_hand) < 17:
+                    succ.dealer_hand += succ.deck.deal(1)
+            elif int(action) in succ.get_actions():
+                succ.bet = int(action)
+                succ.player_hand = succ.deck.deal(2)
+                succ.dealer_hand = succ.deck.deal(2)
+                if succ.score(succ.player_hand) == 21 or succ.score(succ.dealer_hand) == 21:
+                    succ.hand_over = True
+                else:
+                    succ.hand_over = False
+            else:
+                print("Invalid action")
+            succ._compute_hash()
+            return succ
 
+        def update_game(self, action):
             if action == 'H':
                 self.player_hand += self.deck.deal(1)
                 if self.score(self.player_hand) >= 21:
                     self.hand_over = True
                     while self.score(self.dealer_hand) < 17:
                         self.dealer_hand += self.deck.deal(1)
-                return self
             elif action == 'S':
                 self.hand_over = True
                 while self.score(self.dealer_hand) < 17:
@@ -168,10 +192,10 @@ class Game:
                     self.hand_over = True
                 else:
                     self.hand_over = False
-                return self
             else:
                 print("Invalid action")
-                return self
+            self._compute_hash()
+            return self
 
         def score(self, hand):
             score = 0
@@ -187,3 +211,17 @@ class Game:
                 else:
                     score += card.rank()
             return score
+
+        def _compute_hash(self):
+            # faster hash computation; thanks to CF
+            if self.hand_over:
+                self.hash = hash(self.bet)
+                return
+
+            hash_state = (self.score(self.player_hand),
+                          self.score([self.dealer_hand[0]]))
+            self.hash = hash(hash_state)
+
+        def __hash__(self):
+            self._compute_hash()
+            return self.hash

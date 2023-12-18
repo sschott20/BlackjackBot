@@ -2,6 +2,7 @@ from blackjack import *
 import sys
 import argparse
 import time
+import mcts
 
 
 def always_stand(state):
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--time', dest='time', type=float,
                         action="store", default=0.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
-                        "user", "always_hit", "always_stand", "hit_until"], default="basic", help="model to use")
+                        "user", "always_hit", "always_stand", "hit_until", "mcts"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
 
@@ -64,7 +65,8 @@ if __name__ == "__main__":
         predict = always_hit
     elif args.model == "hit_until":
         predict = hit_until
-
+    elif args.model == "mcts":
+        predict = mcts.mcts_policy(1)
     game = Game(args.shoe_size, [i for i in range(1, 10)])
     num_hands = 0
 
@@ -76,11 +78,11 @@ if __name__ == "__main__":
             # print(game.deck.size())
             num_hands += 1
             bet = predict(game.state)
-            game.state.successor(bet)
+            game.state.update_game(bet)
             while not game.state.hand_over:
                 # print(game.state, game.deck.size())
                 action = predict(game.state)
-                game.state.successor(action)
+                game.state.update_game(action)
 
                 if game.state.hand_over:
                     payoff = game.state.payoff()
