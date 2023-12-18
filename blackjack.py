@@ -157,7 +157,7 @@ class Game:
                     succ.hand_over = True
                     while succ.score(succ.dealer_hand) < 17 and not succ.hand_over:
                         succ.dealer_hand += succ.deck.deal(1)
-            if action == 'D':
+            elif action == 'D':
                 succ.bet *= 2
                 succ.player_hand += succ.deck.deal(1)
                 succ.hand_over = True
