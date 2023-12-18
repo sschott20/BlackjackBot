@@ -144,7 +144,7 @@ class Game:
             if self.hand_over:
                 return self.bet_sizes
             else:
-                return ['H', 'S']
+                return ['H', 'S', 'D']
         # def payoff(self):
         #     if self.hand_over:
 
@@ -157,6 +157,12 @@ class Game:
                     succ.hand_over = True
                     while succ.score(succ.dealer_hand) < 17 and not succ.hand_over:
                         succ.dealer_hand += succ.deck.deal(1)
+            if action == 'D':
+                succ.bet *= 2
+                succ.player_hand += succ.deck.deal(1)
+                succ.hand_over = True
+                while succ.score(succ.dealer_hand) < 17:
+                    succ.dealer_hand += succ.deck.deal(1)
             elif action == 'S':
                 succ.hand_over = True
                 while succ.score(succ.dealer_hand) < 17:
@@ -195,7 +201,10 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
-            return self.player_hand
+            # return self.player_hand
+            if len(self.player_hand) == 0:
+                return 0
+            return self.score(self.player_hand)
 
         def _compute_hash(self):
             # faster hash computation; thanks to CF

@@ -1,0 +1,30 @@
+For this project we implemented monte carlo tree search, expectimax and q-learning. 
+
+The baseline agents which will serve as a rough estimate our the improvement gained by using our agents are the following. 
+For these agents its imporant to note that they always bet the minimum - they are losing strategies and so to give them as good odds as possible they should bet as small as they are allowed, which in this case is $1 per hand. None of these agents care about card counting, so deck penitration is irrelivant.
+
+The always hit agents only knows how to hit. This means that on every hand it will either hit blackjack or bust, and does not even look at what the dealer's card is. Unsurprisingly, this is just about the worst agent imaginable, and loses about 65% of the money it puts in (which is actually somewhat surprisingly high)
+
+always_hit
+Money: $-278596
+Hands: 423681
+Money per hand: $-0.6575607591560632
+
+The next simple agent will always stand. Like always hitting, this strategy doesn't take into account the dealer's card, but performs a bit better because the dealer will bust about 30% of the time, and this agent will never bust. This is much better than always_hit, and loses only 18%, but that is still not a way I would want to spend my money.
+
+always_stand
+Money: $-87047
+Hands: 485478
+Money per hand: $-0.17930163673740107
+
+
+The first decent strategy is the dealer. This agent will hit until it has a hand total of 17, just like the dealer. Again this is a significant improvement, and now we only lose about 8% of our money on each bet.
+Money: $-33143
+Hands: 437627
+Money per hand: $-0.07573344423447365
+
+
+
+Money: $47
+Hands: 4418
+Money per hand: $0.010638297872340425
