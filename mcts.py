@@ -24,7 +24,7 @@ def mcts(state, d, is_start):
     if state.hand_over and not is_start:
         return state.payoff()
     state_hash = hash(state)
-    print(state_hash)
+    # print(state_hash)
     # print(state)
     # otherwise choose the action with max weight
     actions = state.get_actions()
@@ -52,6 +52,7 @@ def mcts(state, d, is_start):
     #     print(state, action)
     # print(reward)
     # print(state)
+
     d[(state_hash, action)][0] += reward
     d[(state_hash, action)][1] += 1
 
@@ -65,11 +66,11 @@ def mcts_policy(time_limit):
         start = time.time()
 
         actions = start_state.get_actions()
-
+        start_hash = hash(start_state)
         for s in actions:
-            if (start_state, s) not in d:
-                d[(start_state, s)] = [0, 0]
-
+            if (start_hash, s) not in d:
+                d[(start_hash, s)] = [0, 0]
+        # print(hash(start_state))
         while time.time() - start < time_limit:
             # print(d)
             # print(start_state.deck.size())
@@ -81,14 +82,13 @@ def mcts_policy(time_limit):
 
         # print(d)
         for s in actions:
-            reward, visits = d[(start_state, s)]
-            print((start_state, s), reward, visits)
+            reward, visits = d[(start_hash, s)]
+            # print((start_hash, s), reward, visits)
             scores.append(reward / visits)
 
         global EXPLORATION_CONSTANT
         EXPLORATION_CONSTANT = max(
             abs(max(scores) - min(scores)), EXPLORATION_CONSTANT)
-        print("Done")
 
         return actions[scores.index(max(scores))]
 

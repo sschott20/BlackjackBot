@@ -55,6 +55,9 @@ if __name__ == "__main__":
                         "user", "always_hit", "always_stand", "hit_until", "mcts"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
+    parser.add_argument("--pen ", dest="pen", type=int,
+                        default=6, help="percentage of shoe to reshuffle")
+    parser.add_argument("--display", dest="display", action="store_true")
 
     args = parser.parse_args()
     if args.model == "user":
@@ -66,8 +69,9 @@ if __name__ == "__main__":
     elif args.model == "hit_until":
         predict = hit_until
     elif args.model == "mcts":
-        predict = mcts.mcts_policy(1)
-    game = Game(args.shoe_size, [i for i in range(1, 10)])
+        predict = mcts.mcts_policy(args.time)
+    # print([i for i in range(1, 11, 3)])
+    game = Game(args.shoe_size, [i for i in range(1, 10, 3)])
     num_hands = 0
 
     for i in range(args.count):
@@ -75,19 +79,25 @@ if __name__ == "__main__":
         game.shuffle()
         game.new_shoe()
         while game.deck.size() > (args.shoe_size * 52) / 6:
-            print(game.deck.size())
+            # print(game.deck.size())
             num_hands += 1
             bet = predict(game.state)
             game.state.update_game(bet)
             while not game.state.hand_over:
                 # print(game.state, game.deck.size())
+
                 action = predict(game.state)
+                if args.display:
+                    print(game.state.player_hand,
+                          game.state.score(game.state.player_hand))
+                    print([game.state.dealer_hand[0]])
+                    print("Action: " + str(action))
                 game.state.update_game(action)
 
                 if game.state.hand_over:
                     payoff = game.state.payoff()
                     game.state.money += payoff
-                    if args.model == "user":
+                    if args.display:
                         print("Hand over")
                         print("Player got a " + str(game.state.player_hand) +
                               " for a score of ", game.state.score(game.state.player_hand))
