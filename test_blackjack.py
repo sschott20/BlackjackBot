@@ -28,6 +28,8 @@ def hit_until(state):
             return "H"
         else:
             return "S"
+def gamble(state):
+    
 
 
 def user_mode(state):
