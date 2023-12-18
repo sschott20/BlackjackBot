@@ -82,7 +82,7 @@ class Game:
         self.shoe_size = shoe_size
         self.shuffle()
         self.state = self.initial_state()
-        self.postflop_actions = ['H', 'S']
+        self.postflop_actions = ['H', 'S', 'D']
 
     def all_ranks(self):
         return range(1, 14)

@@ -61,7 +61,7 @@ def qlearn_policy(game, time_limit):
             true_count_bucket = 4
         
         player_total_bucket = 0
-        if player_total < 6:
+        if player_total < 11:
             player_total_bucket = 0
         elif player_total < 15:
             player_total_bucket = 1
