@@ -49,6 +49,7 @@ class Deck:
             copies -- a nonnegative integer
         """
         self._cards = []
+        self.cards_played = []
         for copy in range(copies):
             self._cards.extend(
                 map(lambda c: Card(*c), it.product(ranks, suits)))
@@ -70,6 +71,7 @@ class Deck:
             raise ValueError("Invalid number of cards to deal: " + str(n))
         dealt = self._cards[-n:]
         dealt.reverse()
+        self.cards_played += dealt
         del self._cards[-n:]
         return dealt
 
@@ -80,7 +82,7 @@ class Game:
         self.shoe_size = shoe_size
         self.shuffle()
         self.state = self.initial_state()
-        self.actions = ['H', 'S']
+        self.postflop_actions = ['H', 'S']
 
     def all_ranks(self):
         return range(1, 14)
@@ -88,14 +90,11 @@ class Game:
     def all_suits(self):
         return ['S', 'H', 'D', 'C']
     
-    def get_actions(self):
-        return self.actions
-    
-    def num_of_actions(self):
-        return len(self.actions)
+    def get_postflop_actions(self):
+        return self.postflop_actions
     
     def game_over(self):
-        return self.deck.size <= (self.shoe_size*52)/6
+        return self.deck.size() <= (self.shoe_size*52)/6
 
     def shuffle(self):
         self.deck = Deck(self.all_ranks(), self.all_suits(), self.shoe_size)
@@ -189,7 +188,7 @@ class Game:
                 self.player_hand += self.deck.deal(1)
                 if self.score(self.player_hand) >= 21:
                     self.hand_over = True
-                    while self.score(self.dealer_hand) < 17:
+                    while self.score(self.dealer_hand) < 17 and not self.hand_over:
                         self.dealer_hand += self.deck.deal(1)
             elif action == 'S':
                 self.hand_over = True
@@ -230,7 +229,7 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
-            if len(self.player_hand == 0):
+            if len(self.player_hand) == 0:
                 return 0
             return self.score(self.player_hand)
 
