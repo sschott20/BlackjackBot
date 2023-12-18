@@ -89,9 +89,12 @@ class Game:
 
     def all_suits(self):
         return ['S', 'H', 'D', 'C']
-    
+
     def get_postflop_actions(self):
         return self.postflop_actions
+    
+    def game_over(self):
+        return self.deck.size() <= (self.shoe_size*52)/6
 
     def shuffle(self):
         self.deck = Deck(self.all_ranks(), self.all_suits(), self.shoe_size)
@@ -150,7 +153,7 @@ class Game:
             if self.hand_over:
                 return self.bet_sizes
             else:
-                return ['H', 'S', 'D']
+                return ['H', 'S']
         # def payoff(self):
         #     if self.hand_over:
 
@@ -161,14 +164,8 @@ class Game:
                 succ.player_hand += succ.deck.deal(1)
                 if succ.score(succ.player_hand) >= 21:
                     succ.hand_over = True
-                    while succ.score(succ.dealer_hand) < 17 and not succ.hand_over:
+                    while succ.score(succ.dealer_hand) < 17:
                         succ.dealer_hand += succ.deck.deal(1)
-            elif action == 'D':
-                succ.bet *= 2
-                succ.player_hand += succ.deck.deal(1)
-                succ.hand_over = True
-                while succ.score(succ.dealer_hand) < 17 and not succ.hand_over:
-                    succ.dealer_hand += succ.deck.deal(1)
             elif action == 'S':
                 succ.hand_over = True
                 while succ.score(succ.dealer_hand) < 17:
@@ -207,9 +204,7 @@ class Game:
             return self.score([self.dealer_hand[0]])
 
         def player_score(self):
-            if len(self.player_hand) == 0:
-                return 0
-            return self.score(self.player_hand)
+            return self.player_hand
 
         def _compute_hash(self):
             # faster hash computation; thanks to CF
