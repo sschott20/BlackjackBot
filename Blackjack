@@ -7,5 +7,5 @@ pypy3 test_blackjack.py --count 1000 --model gambler --pen 6
 pypy3 test_blackjack.py --count 1000 --model basic --pen 6 
 pypy3 test_blackjack.py --count 1 --model mcts --pen 6 --time 0.1
 pypy3 test_blackjack.py --count 1 --model mcts_no_tracking --pen 6 --time 0.1
-pypy3 test_blackjack.py --count 1 --model q_learn --pen 6 --time 10
+pypy3 test_blackjack.py --count 1 --model qlearn --pen 6 --time 10
 
