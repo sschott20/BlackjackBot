@@ -66,20 +66,15 @@ def mcts_policy(time_limit):
                 d[(start_hash, s)] = [0, 0]
 
         tmp_state = copy.deepcopy(start_state)
-        # cards = start_state.deck._cards.copy()
 
         while time.time() - start < time_limit:
-            # tmp_state.deck._cards = cards.copy()
-            # tmp_state.deck.shuffle()
             tmp_state = copy.deepcopy(start_state)
             tmp_state.deck.shuffle()
             mcts(tmp_state, d, True)
         scores = []
 
-        # print(d)
         for s in actions:
             reward, visits = d[(start_hash, s)]
-            # print((start_hash, s), reward, visits)
             scores.append(reward / visits)
 
         global EXPLORATION_CONSTANT
