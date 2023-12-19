@@ -9,4 +9,4 @@ dealer: $-0.075
 gambler: $-0.116
 MCTS with deck simulation: $0.0391
 
-Below is a live demo of the agents which runs for only a couple secconds on each one. 
+Below is a live demo of the agents which runs a small sample for each one. 
