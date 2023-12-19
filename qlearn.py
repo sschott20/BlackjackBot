@@ -71,9 +71,6 @@ def qlearn_policy(game, pen, time_limit):
         return (player_total_bucket, dealer_total, usable_ace, true_count_bucket, action)
     
     def q_update(superState, action, reward, nextState, running_count):
-        # need to identify the next state and the next action
-        # dealers and players hands are now known
-        # need to update running count
         action = actions.index(action)
         running_count, true_count, decks_remaining = count_cards(running_count, nextState)
         statekey = find_key(superState, action)
@@ -107,7 +104,6 @@ def qlearn_policy(game, pen, time_limit):
         return true_count
 
     def get_optimal_action(state):
-        # need to calculate the true count from the state given
         true_count = calc_true_count(state)
         player_score = state.player_score()
         if player_score >= 21:
@@ -148,7 +144,6 @@ def qlearn_policy(game, pen, time_limit):
     intial_state = game.initial_state()
     while time.time() < end_time:
         tmp = copy.deepcopy(intial_state)
-        # state = (true_count, hand_total, usable_ace, dealer_total)
         game.shuffle()
         game.new_shoe()
         running_count = 0
@@ -164,13 +159,10 @@ def qlearn_policy(game, pen, time_limit):
             superState = (true_count, player_total, usable_ace, dealer_total)
             reward = 0
             while not tmp.hand_over:
-                action = get_action(tmp) # postflop action (hit or stand)
+                action = get_action(tmp) # postflop action (hit stand or double)
                 tmp = tmp.successor(action)
                 reward += tmp.payoff()
                 q_update(superState, action, reward, tmp, running_count)
         epsilon = max(EPSILON_END, epsilon * EPSILON_DECAY)
-        # for key in q_vals.keys():
-        #     if q_vals[key] != 0:
-        #         print(f"key: {key}, q_val: {q_vals[key]}")
 
     return get_optimal_action
