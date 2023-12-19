@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument('--time', dest='time', type=float,
                         action="store", default=.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
-                        "user", "always_hit", "always_stand", "hit_until", "mcts", "gambler", "basic", "mcts_no_tracking", "qlearn"], default="basic", help="model to use")
+                        "user", "always_hit", "always_stand", "hit_until", "mcts", "gambler", "basic", "mcts_no_tracking", "qlearn", "xmax"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
     parser.add_argument("--pen ", dest="pen", type=int,

@@ -1,8 +1,6 @@
 import random
 import itertools as it
 import functools
-# blackjack
-
 
 @functools.total_ordering
 class Card:
@@ -117,7 +115,6 @@ class Game:
             self.hand_over = hand_over
 
         def __str__(self):
-            # return str(self.player_hand) + " " + str(self.dealer_hand) + " " + str(self.bet) + " " + str(self.money) + " " + str(self.bet_sizes[-1]) + " " + str(self.shoe_size) + " " + str(self.hand_over)
             return "---\nPlayer Hand: " + str(self.player_hand) + " " + str(self.score(self.player_hand)) + "\nDealer Hand: " + str(self.dealer_hand) + "\nBet: " + str(self.bet) + "\nMoney: " + str(self.money) + "\nBet Sizes: " + str(self.bet_sizes[-1]) + "\nShoe Size: " + str(self.shoe_size) + "\nHand Over: " + str(self.hand_over) + "\n---"
 
         def payoff(self):
@@ -151,8 +148,6 @@ class Game:
                 return self.bet_sizes
             else:
                 return ['H', 'S', 'D']
-        # def payoff(self):
-        #     if self.hand_over:
 
         def successor(self, action):
             succ = Game.State(self.player_hand, self.dealer_hand, self.deck,
@@ -183,7 +178,6 @@ class Game:
                     succ.hand_over = False
             else:
                 print("Invalid action")
-            # succ._compute_hash()
             return succ
 
         def score(self, hand):
@@ -223,9 +217,6 @@ class Game:
             self.hash = hash(hash_state)
 
         def __hash__(self):
-            # self._compute_hash()
-            # return self.hash
-            # print(self.score(self.player_hand))
             if len(self.dealer_hand) == 0:
                 return hash((self.score(self.player_hand), 0))
             return hash((self.score(self.player_hand), self.score([self.dealer_hand[0]])))
