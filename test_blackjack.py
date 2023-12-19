@@ -2,8 +2,10 @@ from blackjack import *
 import sys
 import argparse
 import time
-import mcts, qlearn
-import mcts_no_counting as mcts2
+import mcts
+import qlearn
+import mcts_no_tracking
+
 
 def always_stand(state):
     if state.hand_over:
@@ -23,6 +25,18 @@ def hit_until(state):
     if state.hand_over:
         return 1
     else:
+        if state.score(state.player_hand) < 17:
+            return "H"
+        else:
+            return "S"
+
+
+def basic(state):
+    if state.hand_over:
+        return 1
+    else:
+        if state.score(state.player_hand) < 11:
+            return "D"
         if state.score(state.player_hand) < 17:
             return "H"
         else:
@@ -61,7 +75,11 @@ if __name__ == "__main__":
     parser.add_argument('--time', dest='time', type=float,
                         action="store", default=.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
+<<<<<<< HEAD
                         "user", "always_hit", "always_stand", "hit_until", "mcts", "mcts2", "gamble", "qlearn"], default="basic", help="model to use")
+=======
+                        "user", "always_hit", "always_stand", "hit_until", "mcts", "gambler", "basic", "mcts_no_tracking"], default="basic", help="model to use")
+>>>>>>> 83812593dccbcf9947177443cb6167128860f4a5
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
     parser.add_argument("--pen ", dest="pen", type=int,
@@ -82,12 +100,18 @@ if __name__ == "__main__":
         predict = hit_until
     elif args.model == "mcts":
         predict = mcts.mcts_policy(args.time)
-    elif args.model == "mcts2":
-        predict = mcts2.mcts_policy(args.time)
-    elif args.model == "gamble":
+    elif args.model == "gambler":
         predict = gamble
+<<<<<<< HEAD
     elif args.model == "qlearn":
         predict = qlearn.qlearn_policy(game, args.pen, args.time)
+=======
+    elif args.model == "basic":
+        predict = basic
+    elif args.model == "mcts_no_tracking":
+        predict = mcts_no_tracking.mcts_policy(args.time)
+
+>>>>>>> 83812593dccbcf9947177443cb6167128860f4a5
     # print([i for i in range(1, 11, 3)])
     num_hands = 0
 
@@ -132,12 +156,7 @@ if __name__ == "__main__":
                             print("You lost " + str(game.state.bet))
                         input("Current balance: " +
                               str(game.state.money) + "\n")
-        if args.display:
-            print("---------")
-            print("Money: $" + str(game.state.money))
-            print("Hands: " + str(num_hands))
-            print("Money per hand: $" + str(game.state.money / num_hands))
-    print("--------")
-    print("Money: $" + str(game.state.money))
+    print("----------------")
+    print("Model: " + args.model)
     print("Hands: " + str(num_hands))
     print("Money per hand: $" + str(game.state.money / num_hands))

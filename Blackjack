@@ -1,0 +1,10 @@
+#!/bin/bash
+cat results
+pypy3 test_blackjack.py --count 1000 --model always_stand --pen 6 
+pypy3 test_blackjack.py --count 1000 --model always_hit --pen 6 
+pypy3 test_blackjack.py --count 1000 --model hit_until --pen 6 
+pypy3 test_blackjack.py --count 1000 --model gambler --pen 6 
+pypy3 test_blackjack.py --count 1000 --model basic --pen 6 
+pypy3 test_blackjack.py --count 1 --model mcts --pen 6 --time 0.1
+pypy3 test_blackjack.py --count 1 --model mcts_no_tracking --pen 6 --time 0.1
+
