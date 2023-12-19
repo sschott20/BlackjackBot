@@ -1,12 +1,17 @@
+List of Group Members: Alex Shin (ajs297), Alex Schott (sas342), Jinwoo Kim (jk2783)
+
 For this project we implemented monte carlo tree search, expectimax and q-learning. For basic agents to compare against, we have a few options, which are listed below. Overall our best performance was with mcts which simulates the entire remaining deck, and manages to win around $0.039 per hand on average (when bets are $1 - $10). All agents use a dealer which hits until a 17.
 
-
 For each bot here we are displaying the total money gained / lost over many shoes of play, divided by the total number of hands the agent played. We reshuffle once we have reached 80% deck penetration.  
+
+
 
 always_hit: $-0.657
 always_stand: $-0.179
 dealer: $-0.075
 gambler: $-0.116
-MCTS with deck simulation: $0.0391
+MCTS with more deck simulation (count = 1000): $0.0391
+Q-Learning with longer training time liimit(time = 3600): $-0.0864
+Expectimax with more deck simulation(count = 100): $-0.0646
 
 Below is a live demo of the agents which runs for only a couple secconds on each one. 
