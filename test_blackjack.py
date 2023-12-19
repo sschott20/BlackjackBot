@@ -75,11 +75,7 @@ if __name__ == "__main__":
     parser.add_argument('--time', dest='time', type=float,
                         action="store", default=.1, help='time allowed per move')
     parser.add_argument('--model', dest="model", choices=[
-<<<<<<< HEAD
-                        "user", "always_hit", "always_stand", "hit_until", "mcts", "mcts2", "gamble", "qlearn"], default="basic", help="model to use")
-=======
-                        "user", "always_hit", "always_stand", "hit_until", "mcts", "gambler", "basic", "mcts_no_tracking"], default="basic", help="model to use")
->>>>>>> 83812593dccbcf9947177443cb6167128860f4a5
+                        "user", "always_hit", "always_stand", "hit_until", "mcts", "gambler", "basic", "mcts_no_tracking", "qlearn"], default="basic", help="model to use")
     parser.add_argument('--shoe_size', dest="shoe_size", type=int,
                         default=6, help="number of decks in shoe")
     parser.add_argument("--pen ", dest="pen", type=int,
@@ -102,16 +98,13 @@ if __name__ == "__main__":
         predict = mcts.mcts_policy(args.time)
     elif args.model == "gambler":
         predict = gamble
-<<<<<<< HEAD
     elif args.model == "qlearn":
         predict = qlearn.qlearn_policy(game, args.pen, args.time)
-=======
     elif args.model == "basic":
         predict = basic
     elif args.model == "mcts_no_tracking":
         predict = mcts_no_tracking.mcts_policy(args.time)
 
->>>>>>> 83812593dccbcf9947177443cb6167128860f4a5
     # print([i for i in range(1, 11, 3)])
     num_hands = 0
 
