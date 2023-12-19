@@ -7,20 +7,17 @@ import xmax
 import qlearn
 import mcts_no_tracking
 
-
 def always_stand(state):
     if state.hand_over:
         return 1
     else:
         return "S"
 
-
 def always_hit(state):
     if state.hand_over:
         return 1
     else:
         return "H"
-
 
 def hit_until(state):
     if state.hand_over:
@@ -30,7 +27,6 @@ def hit_until(state):
             return "H"
         else:
             return "S"
-
 
 def basic(state):
     if state.hand_over:
@@ -43,13 +39,11 @@ def basic(state):
         else:
             return "S"
 
-
 def gamble(state):
     if state.hand_over:
         return 1
     else:
         return 'D'
-
 
 def user_mode(state):
     print()
@@ -67,7 +61,6 @@ def user_mode(state):
     elif int(action) in state.get_actions():
         return int(action)
     return action
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Blackjack Bot")
@@ -108,24 +101,19 @@ if __name__ == "__main__":
     elif args.model == "mcts_no_tracking":
         predict = mcts_no_tracking.mcts_policy(args.time)
 
-    # print([i for i in range(1, 11, 3)])
     num_hands = 0
 
     for i in range(args.count):
         current_shoe_winnings = 0
-        # print("Shoe " + str(i + 1) + " of " + str(args.count))
         game.shuffle()
         game.new_shoe()
         while game.deck.size() > (args.shoe_size * 52) / args.pen:
-            # print(game.deck.size())
             num_hands += 1
             bet = predict(game.state)
             if args.user:
                 print("Bet: " + str(bet))
             game.state = game.state.successor(bet)
             while not game.state.hand_over:
-                # print(game.state, game.deck.size())
-
                 action = predict(game.state)
                 if args.user:
                     print(game.state.player_hand,
