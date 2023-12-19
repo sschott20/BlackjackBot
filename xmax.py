@@ -34,7 +34,6 @@ def get_stand_payoff(player_rank, old_rank, new_rank, stand_payoff):
     else:
         return stand_payoff[total][player_rank]
 
-
 def calculate_payoffs(state):        
 
     probs = {
@@ -124,8 +123,6 @@ def xmax_policy():
                 divisor += 1
         return total/divisor
                 
-
-
     def best_move(state):
         hit_payoff, stand_payoff, action_matrix, probs = calculate_payoffs(state)
         actions = state.get_actions()
@@ -151,5 +148,3 @@ def xmax_policy():
             return action_matrix[state.dealer_score()][state.player_score()]
     
     return best_move
-
-
