@@ -1,4 +1,5 @@
 #!/bin/bash
+cat results
 pypy3 test_blackjack.py --count 1000 --model always_stand --pen 6 
 pypy3 test_blackjack.py --count 1000 --model always_hit --pen 6 
 pypy3 test_blackjack.py --count 1000 --model hit_until --pen 6 

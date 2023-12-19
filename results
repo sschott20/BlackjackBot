@@ -1,35 +1,12 @@
-For this project we implemented monte carlo tree search, expectimax and q-learning. To run the agents, run the 
-
-The baseline agents which will serve as a rough estimate our the improvement gained by using our agents are the following. 
-For these agents its imporant to note that they always bet the minimum - they are losing strategies and so to give them as good odds as possible they should bet as small as they are allowed, which in this case is $1 per hand. None of these agents care about card counting, so deck penitration is irrelivant.
-
-The always hit agents only knows how to hit. This means that on every hand it will either hit blackjack or bust, and does not even look at what the dealer's card is. Unsurprisingly, this is just about the worst agent imaginable, and loses about 65% of the money it puts in (which is actually somewhat surprisingly high).
-
-For each bot here we are displaying the total money gained / lost divided by the number of hands the agent played. 
-
-always_hit
-Money per hand: $-0.6575607591560632
-
-The next simple agent will always stand. Like always hitting, this strategy doesn't take into account the dealer's card, but performs a bit better because the dealer will bust about 30% of the time, and this agent will never bust. This is much better than always_hit, and loses only 18%, but that is still not a way I would want to spend my money.
-
-always_stand
-Money per hand: $-0.17930163673740107
+For this project we implemented monte carlo tree search, expectimax and q-learning. For basic agents to compare against, we have a few options, which are listed below. Overall our best performance was with mcts which simulates the entire remaining deck, and manages to win around $0.03 per hand on average (when bets are $1 - $10). All agents use a dealer which hits until a 17.
 
 
-The first decent strategy is the dealer. This agent will hit until it has a hand total of 17, just like the dealer. Again this is a significant improvement, and now we only lose about 8% of our money on each bet.
-Money: $-33143
-Hands: 437627
-Money per hand: $-0.07573344423447365
+For each bot here we are displaying the total money gained / lost over many shoes of play, divided by the total number of hands the agent played. We reshuffle once we have reached 80% deck penetration.  
 
-Finally we have the gambler, who always doubles down when his hand is less than or equal to 10, other wise he hits to 17. The doubling down turns out to not be good for EV, and this agent still loses about 11% of its money on each hand. 
-Money: $-57075
-Hands: 491013
-Money per hand: $-0.11623928490691693
+always_hit: $-0.657
+always_stand: $-0.179
+dealer: $-0.075
+gambler: $-0.116
+MCTS with deck simulation: $0.0391
 
-
-As expected, monte carlo simulation works really well for blackjack. We keep track of the entrie remaining deck and just randomly deal from it 
-MCTS with deck simulation 
-Money: $192
-Hands: 4905
-Money per hand: $0.03914373088685015
-
+Below is a live demo of the agents which runs for only a couple secconds on each one. 
