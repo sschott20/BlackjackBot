@@ -5,7 +5,7 @@ EPSILON_START = 0.15
 EPSILON_END = 0.01
 EPSILON_DECAY = 0.995
 
-def qlearn_policy(game, time_limit):
+def qlearn_policy(game, pen, time_limit):
     def get_action(state):
         if random.random() < epsilon:
             if len(state.player_hand) == 0 or state.hand_over:
@@ -154,7 +154,7 @@ def qlearn_policy(game, time_limit):
         running_count = 0
         true_count = 0
         decks_remaining = game.shoe_size * 6
-        while tmp.deck.size() > (game.shoe_size*52)/6:
+        while tmp.deck.size() > (game.shoe_size*52)/pen:
             action = get_action(tmp)
             tmp = tmp.successor(action) # place bet and cards are dealt
             player_total = 15 if tmp.player_score() > 14 else tmp.player_score()
