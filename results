@@ -1,4 +1,4 @@
-For this project we implemented monte carlo tree search, expectimax and q-learning. For basic agents to compare against, we have a few options, which are listed below. Overall our best performance was with mcts which simulates the entire remaining deck, and manages to win around $0.03 per hand on average (when bets are $1 - $10). All agents use a dealer which hits until a 17.
+For this project we implemented monte carlo tree search, expectimax and q-learning. For basic agents to compare against, we have a few options, which are listed below. Overall our best performance was with mcts which simulates the entire remaining deck, and manages to win around $0.039 per hand on average (when bets are $1 - $10). All agents use a dealer which hits until a 17.
 
 
 For each bot here we are displaying the total money gained / lost over many shoes of play, divided by the total number of hands the agent played. We reshuffle once we have reached 80% deck penetration.  
