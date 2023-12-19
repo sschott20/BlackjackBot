@@ -3,6 +3,7 @@ import sys
 import argparse
 import time
 import mcts
+import xmax
 import qlearn
 import mcts_no_tracking
 
@@ -96,6 +97,8 @@ if __name__ == "__main__":
         predict = hit_until
     elif args.model == "mcts":
         predict = mcts.mcts_policy(args.time)
+    elif args.model == "xmax":
+        predict = xmax.xmax_policy()
     elif args.model == "gambler":
         predict = gamble
     elif args.model == "qlearn":
